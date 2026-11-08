@@ -1,0 +1,43 @@
+name: Construire l'APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      # Polices du jeu embarquées dans l'app (licence SIL OFL). Si le téléchargement échoue, l'app utilise les polices du téléphone.
+      - name: Polices du jeu
+        continue-on-error: true
+        run: |
+          mkdir -p fonts
+          curl -fsSL -o fonts/Baloo2.ttf "https://github.com/google/fonts/raw/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf"
+          curl -fsSL -o fonts/Nunito.ttf "https://github.com/google/fonts/raw/main/ofl/nunito/Nunito%5Bwght%5D.ttf"
+
+      - name: Construire l'APK
+        working-directory: android
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Renommer l'APK
+        run: cp android/app/build/outputs/apk/release/app-release.apk PatrouilleCourse.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PatrouilleCourse-apk
+          path: PatrouilleCourse.apk
