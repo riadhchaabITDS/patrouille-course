@@ -1,5 +1,11 @@
 <title>La Patrouille qui fait la course</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#FFC83D">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Patrouille">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
@@ -79,6 +85,11 @@ kbd{font:800 18px var(--display);background:var(--paper);border:2px solid var(--
 .ctrl button{pointer-events:auto;width:92px;height:92px;border-radius:50%;font-size:46px;background:rgba(255,200,61,.92);border:3px solid var(--ink);box-shadow:0 6px 0 var(--ink);cursor:pointer;color:var(--ink)}
 .ctrl.two button{width:70px;height:70px;font-size:34px}
 .ctrl button:active{transform:translateY(5px);box-shadow:0 1px 0 var(--ink)}
+.keyhint{display:none;align-items:center;gap:6px;background:rgba(255,253,246,.92);border:3px solid var(--ink);border-radius:16px;padding:6px 12px;font:800 18px var(--display);pointer-events:none}
+.ctrl.one{justify-content:center}
+/* Ordinateur portable (souris + clavier) : on montre les touches au lieu des boutons tactiles */
+@media (hover:hover) and (pointer:fine){.ctrl button{display:none}.keyhint{display:flex}}
+@media not ((hover:hover) and (pointer:fine)){.ctrl.one .keyhint{display:none}}
 .count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:800 clamp(80px,26vw,180px) var(--display);color:var(--paper);-webkit-text-stroke:4px var(--ink);z-index:4;pointer-events:none}
 /* result & final */
 .medalbig{font-size:clamp(110px,30vw,180px);line-height:1;animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
@@ -102,7 +113,7 @@ kbd{font:800 18px var(--display);background:var(--paper);border:2px solid var(--
 @media (prefers-reduced-motion:reduce){.medalbig,.cup{animation:none}.track canvas{transition:none}}
 </style>
 
-<span class="tag">Maquette v0.5</span>
+<span class="tag">Maquette v0.6</span>
 <button class="musicbtn" id="musicBtn" aria-label="Musique">🔊</button>
 
 <!-- 1. Accueil -->
@@ -116,6 +127,7 @@ kbd{font:800 18px var(--display);background:var(--paper);border:2px solid var(--
     <button class="big" id="play1">▶ 1 joueur</button>
     <button class="big blue" id="play2">👫 2 joueurs</button>
   </div>
+  <button class="big small" id="installBtn" hidden>📲 Installer le jeu</button>
 </section>
 
 <!-- 2. Choix du chiot -->
@@ -384,13 +396,19 @@ function buildCtrl(){
   const c=$('#ctrl');c.innerHTML='';c.className='ctrl'+(state.mode===2?' two':'');
   const btn=(txt,i,d)=>{const b=document.createElement('button');b.textContent=txt;b.setAttribute('aria-label',d<0?'Gauche':'Droite');
     b.onpointerdown=e=>{e.preventDefault();move(i,d)};return b};
-  if(state.mode===1){c.append(btn('⬅️',0,-1),btn('➡️',0,1));return}
+  const hint=html=>{const h=document.createElement('div');h.className='keyhint';h.innerHTML=html;return h};
+  if(state.mode===1){
+    if(matchMedia('(hover:hover) and (pointer:fine)').matches){c.classList.add('one');
+      c.append(hint('<kbd>←</kbd><kbd>→</kbd> ou <kbd>J</kbd><kbd>L</kbd> pour bouger · <kbd>P</kbd> pause'))}
+    else c.append(btn('⬅️',0,-1),btn('➡️',0,1));
+    return}
   // Joueur 2 à gauche (A/D), Joueur 1 à droite (J/L), comme sur le clavier
   [[1,'A · D'],[0,'J · L']].forEach(([i,keys])=>{
     const pad=document.createElement('div');pad.className='pad';
     const l=document.createElement('span');l.className='lbl p'+(i+1);l.textContent=`${pupById(state.players[i]).name} · ${keys}`;
     const row=document.createElement('div');row.className='row';row.append(btn('⬅️',i,-1),btn('➡️',i,1));
-    pad.append(l,row);c.append(pad)});
+    const k=i===0?'<kbd>J</kbd> ⬅️ ➡️ <kbd>L</kbd>':'<kbd>A</kbd> ⬅️ ➡️ <kbd>D</kbd>';
+    pad.append(l,row,hint(k));c.append(pad)});
 }
 function buildHud(){
   const tr=$('#track');tr.innerHTML='';
@@ -433,6 +451,8 @@ $('#pauseBtn').onclick=()=>setPause(!(R&&R.paused));
 $('#resumeBtn').onclick=()=>setPause(false);
 $('#stopBtn').onclick=quitRace;
 $('#menuBtn').onclick=quitRace;
+// Accueil au clavier : touche 1 ou 2 pour choisir le nombre de joueurs
+addEventListener('keydown',e=>{if(!$('#home').hidden&&$('#spec').hidden){if(e.key==='1')startMode(1);if(e.key==='2')startMode(2)}});
 addEventListener('keydown',e=>{if($('#race').hidden||e.repeat)return;const k=e.key.toLowerCase();
   if(k==='p'||k===' '||k==='escape'){e.preventDefault();setPause(k==='escape'?true:!R.paused);return}
   if(R&&R.paused)return;
@@ -612,6 +632,15 @@ window.onAndroidBack=()=>{
   if(!$('#race').hidden&&R&&!R.done){if(R.paused)quitRace();else setPause(true);return true}
   if($('#home').hidden){show('home');return true}
   return false};
+
+/* ---------- version web en ligne : hors-ligne + installation (sans effet dans Claude ni dans l'app) ---------- */
+const onWebSite=location.protocol==='https:'&&!/claude/i.test(location.hostname);
+if(onWebSite&&'serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
+let installEvt=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;$('#installBtn').hidden=false});
+$('#installBtn').onclick=async()=>{if(!installEvt)return;installEvt.prompt();try{await installEvt.userChoice}catch(e){}installEvt=null;$('#installBtn').hidden=true};
+addEventListener('appinstalled',()=>{$('#installBtn').hidden=true});
+if(onWebSite)document.documentElement.classList.add('app');
 
 /* ---------- confettis ---------- */
 function confetti(){
