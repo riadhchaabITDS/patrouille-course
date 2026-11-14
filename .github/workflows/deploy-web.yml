@@ -30,6 +30,9 @@ jobs:
           rsvg-convert -w 512 -h 512 web/icon.svg -o site/icon-512.png
           curl -fsSL -o site/fonts/Baloo2.ttf "https://github.com/google/fonts/raw/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf" || true
           curl -fsSL -o site/fonts/Nunito.ttf "https://github.com/google/fonts/raw/main/ofl/nunito/Nunito%5Bwght%5D.ttf" || true
+          mkdir -p site/parc
+          cp course-copains/parc.html site/parc/index.html
+          cp course-copains/personnages.html site/parc/personnages.html
           touch site/.nojekyll
           ls -la site site/fonts
 

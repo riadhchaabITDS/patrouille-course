@@ -1,0 +1,270 @@
+<title>Les coureurs de Sofia</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: a "starting grid" of racer cards (girls, then boys); tap a card to dress the racer. Deliberately single bright theme, same family as the first game */
+:root{
+  --sky:#8FD8F8; --sky2:#C9EEFF; --sun:#FFC83D; --berry:#FF5C8A; --blue:#3D7BFF;
+  --ink:#1F2A44; --paper:#FFFDF6; --soft:#FFF1C9;
+  --display:"Baloo 2","Comic Sans MS","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Trebuchet MS",system-ui,sans-serif;
+  color-scheme:light;
+}
+html,body{min-height:100%}
+[hidden]{display:none!important}
+body{background:linear-gradient(var(--sky),var(--sky2));color:var(--ink);font-family:var(--body);-webkit-tap-highlight-color:transparent}
+.wrap{max-width:980px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+header{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.tag{font:800 12px var(--body);letter-spacing:.08em;text-transform:uppercase;background:var(--paper);border:2px solid var(--ink);border-radius:99px;padding:3px 10px}
+h1{font:800 clamp(36px,8vw,64px)/1 var(--display);margin:0;color:var(--paper);-webkit-text-stroke:2px var(--ink);text-shadow:0 5px 0 var(--ink);text-wrap:balance}
+.lead{font:700 17px/1.4 var(--body);margin:0;max-width:44ch}
+h2{font:800 30px/1 var(--display);margin:0;display:flex;align-items:center;gap:10px}
+h2 .count{font:800 16px var(--body);background:var(--paper);border:2px solid var(--ink);border-radius:99px;padding:0 10px}
+section{display:flex;flex-direction:column;gap:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+.card{position:relative;background:var(--paper);border:3px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);padding:8px 6px 10px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;font:800 24px/1.1 var(--display);color:var(--ink);transition:transform .1s}
+.card:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink)}
+.card:focus-visible{outline:4px solid var(--berry);outline-offset:3px}
+.card canvas{width:120px;height:120px}
+.card .bib{position:absolute;top:8px;left:8px;font:800 14px var(--display);background:var(--sun);border:2px solid var(--ink);border-radius:8px;padding:0 6px}
+.card.me{background:#FFE3EC}
+.card.me .star{position:absolute;top:6px;right:8px;font:800 12px var(--body);background:var(--berry);color:var(--paper);border:2px solid var(--ink);border-radius:99px;padding:0 8px}
+.card small{font:700 13px var(--body);color:var(--ink)}
+.hop{animation:hop .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes hop{30%{transform:translateY(-14px) rotate(-4deg)}60%{transform:translateY(0) rotate(3deg)}}
+.foot{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center}
+.btn{font:800 20px var(--display);background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:20px;box-shadow:0 5px 0 var(--ink);padding:6px 20px;cursor:pointer}
+.btn.ghost{background:var(--paper)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.btn:focus-visible{outline:4px solid var(--berry);outline-offset:3px}
+.note{font:700 14px var(--body);background:rgba(255,253,246,.85);border:2px solid var(--ink);border-radius:14px;padding:8px 14px;max-width:60ch;text-align:center}
+#copyOut{width:100%;max-width:640px;min-height:120px;font:600 14px/1.4 var(--body);border:2px solid var(--ink);border-radius:12px;padding:10px;background:var(--paper);color:var(--ink)}
+/* editor */
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(31,42,68,.55);display:flex;align-items:center;justify-content:center;
+  padding-block:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-bottom,0px));padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:26px;width:100%;max-width:760px;max-height:100%;overflow:auto;padding:16px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:16px}
+.preview{display:flex;flex-direction:column;align-items:center;gap:8px;position:sticky;top:0}
+.preview canvas{width:200px;height:200px;background:var(--sky2);border:3px solid var(--ink);border-radius:22px}
+.preview .nm{font:800 34px/1 var(--display)}
+.opts{display:flex;flex-direction:column;gap:12px;min-width:0}
+.opt h3{font:800 18px var(--display);margin:0 0 6px}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:46px;height:46px;border-radius:50%;border:3px solid var(--ink);cursor:pointer;box-shadow:0 3px 0 var(--ink)}
+.sw[aria-pressed="true"]{outline:4px solid var(--berry);outline-offset:2px}
+.pick{background:var(--soft);border:3px solid var(--ink);border-radius:14px;cursor:pointer;padding:2px 4px 4px;display:flex;flex-direction:column;align-items:center;font:700 12px var(--body);color:var(--ink)}
+.pick canvas{width:64px;height:64px}
+.pick[aria-pressed="true"]{background:#FFD3DF;outline:4px solid var(--berry);outline-offset:1px}
+.close{display:flex;gap:10px;justify-content:center;grid-column:1/-1}
+@media (max-width:620px){.panel{grid-template-columns:1fr}.preview{position:static}.preview canvas{width:150px;height:150px}}
+@media (prefers-reduced-motion:reduce){.hop{animation:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="tag">Personnages · maquette v0.8</span>
+    <h1>Les coureurs de Sofia</h1>
+    <p class="lead">Touche un coureur pour l'entendre dire bonjour et changer ses cheveux, sa peau, son maillot ou son accessoire.</p>
+  </header>
+
+  <section aria-labelledby="hGirls">
+    <h2 id="hGirls">Les filles <span class="count" id="nGirls"></span></h2>
+    <div class="grid" id="girls"></div>
+  </section>
+
+  <section aria-labelledby="hBoys">
+    <h2 id="hBoys">Les garçons <span class="count" id="nBoys"></span></h2>
+    <div class="grid" id="boys"></div>
+  </section>
+
+  <div class="foot">
+    <button class="btn" id="copyBtn">📋 Copier la fiche des coureurs</button>
+    <button class="btn ghost" id="resetBtn">↺ Revenir aux propositions</button>
+  </div>
+  <textarea id="copyOut" hidden readonly aria-label="Fiche des coureurs"></textarea>
+  <p class="note">Les looks sont des propositions de départ : je ne connais pas les copains et copines de Sofia, c'est elle qui choisit. Ses choix restent sur cet appareil. Le bouton « Copier la fiche » permet de me les envoyer pour le jeu.</p>
+</div>
+
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="edName">
+  <div class="panel">
+    <div class="preview"><canvas id="big" width="400" height="400"></canvas><div class="nm" id="edName">Sofia</div>
+      <button class="btn ghost" id="hello">👋 Dis bonjour</button></div>
+    <div class="opts">
+      <div class="opt"><h3>Coiffure</h3><div class="row" id="optStyle"></div></div>
+      <div class="opt"><h3>Couleur des cheveux</h3><div class="row" id="optHair"></div></div>
+      <div class="opt"><h3>Couleur de peau</h3><div class="row" id="optSkin"></div></div>
+      <div class="opt"><h3>Yeux</h3><div class="row" id="optEyes"></div></div>
+      <div class="opt"><h3>Couleur du maillot</h3><div class="row" id="optShirt"></div></div>
+      <div class="opt"><h3>Accessoire</h3><div class="row" id="optAcc"></div></div>
+    </div>
+    <div class="close"><button class="btn" id="done">✔ C'est bon !</button></div>
+  </div>
+</div>
+
+<script>
+const INK='#1F2A44';
+const HAIR=[['brun','#6B3F22'],['noir','#24201F'],['châtain','#9A6A3A'],['blond','#F2C14E'],['blond clair','#F8E7B0'],['roux','#D9622B'],['rose','#FF7FB0'],['bleu','#4F8DF7']];
+const SKIN=[['très clair','#FCE3D0'],['clair','#F5CBA7'],['doré','#E2A87C'],['mat','#C98B5E'],['foncé','#8D5A3B']];
+const SHIRT=[['rose','#FF5C8A'],['rouge','#E8402A'],['orange','#FF9A3D'],['jaune','#FFC83D'],['vert','#2EB67D'],['bleu','#3D7BFF'],['violet','#8E5BFF'],['bleu marine','#1F3B73']];
+const STYLES=[['court','Courts'],['herisse','Hérissés'],['boucles','Bouclés'],['frises','Frisés'],['long','Longs'],['couettes','Couettes'],['queue','Queue'],['chignon','Chignon']];
+const ACC=[['aucun','Rien'],['noeud','Nœud'],['lunettes','Lunettes'],['casquette','Casquette']];
+const EYES=[['ronds','Ronds'],['amande','En amande']];
+const col=(list,k)=>(list.find(x=>x[0]===k)||list[0])[1];
+const label=(list,k)=>(list.find(x=>x[0]===k)||list[0])[1];
+
+/* Propositions de départ : Sofia choisit ensuite */
+const DEFAULTS=[
+  {id:'sofia', name:'Sofia', g:'f',hair:'brun',   style:'long',    skin:'clair',     shirt:'rose',       acc:'noeud', me:true},
+  /* Looks décrits par Sofia (14/11) */
+  {id:'rose',  name:'Rose T.',g:'f',hair:'noir',  style:'long',    skin:'clair',     shirt:'rouge',      acc:'aucun', eyes:'amande'},
+  {id:'roses', name:'Rose S.',g:'f',hair:'blond clair',style:'queue',skin:'très clair',shirt:'violet',   acc:'aucun'},
+  {id:'lea',   name:'Léa G',   g:'f',hair:'blond clair',style:'long', skin:'très clair',shirt:'orange',    acc:'aucun'},
+  {id:'lily',  name:'Lily',  g:'f',hair:'brun',   style:'chignon', skin:'clair',     shirt:'vert',       acc:'noeud'},
+  {id:'louise',name:'Louise',g:'f',hair:'blond clair',style:'couettes',skin:'très clair',shirt:'bleu',   acc:'aucun'},
+  {id:'talia', name:'Talia', g:'f',hair:'brun',   style:'long',    skin:'clair',     shirt:'jaune',      acc:'aucun', eyes:'amande'},
+  {id:'hanah', name:'Hana H.',g:'f',hair:'noir',  style:'queue',   skin:'clair',     shirt:'rose',       acc:'aucun'},
+  {id:'anna',  name:'Anna',  g:'f',hair:'brun',   style:'couettes',skin:'clair',     shirt:'violet',     acc:'aucun'},
+  {id:'julia', name:'Julia', g:'f',hair:'noir',   style:'long',    skin:'clair',     shirt:'vert',       acc:'aucun'},
+  {id:'lea2',  name:'Léa', g:'f',hair:'noir',   style:'couettes',skin:'mat',       shirt:'jaune',      acc:'noeud'},
+  {id:'chiara',name:'Chiara',g:'f',hair:'noir',   style:'frises',  skin:'mat',       shirt:'rose',       acc:'aucun'},
+  {id:'milan', name:'Milan', g:'m',hair:'châtain',style:'frises',  skin:'mat',       shirt:'bleu',       acc:'aucun'},
+  {id:'michael',name:'Michael',g:'m',hair:'brun',  style:'court',   skin:'clair',     shirt:'vert',       acc:'aucun'},
+  {id:'louis', name:'Louis', g:'m',hair:'blond clair',style:'court',skin:'très clair',shirt:'jaune',     acc:'aucun'},
+  {id:'evan',  name:'Evan',  g:'m',hair:'noir',   style:'frises',  skin:'foncé',     shirt:'bleu marine',acc:'aucun'},
+  {id:'oren',  name:'Oren',  g:'m',hair:'noir',   style:'frises',  skin:'foncé',     shirt:'rouge',      acc:'aucun'},
+  {id:'liam',  name:'Liam',  g:'m',hair:'brun',   style:'court',   skin:'clair',     shirt:'violet',     acc:'aucun'},
+  {id:'zayn',  name:'Zayn',  g:'m',hair:'brun',   style:'court',   skin:'clair',     shirt:'orange',     acc:'aucun'},
+  {id:'aamir', name:'Aamir', g:'m',hair:'châtain',style:'court',   skin:'doré',      shirt:'jaune',      acc:'aucun'},
+  {id:'christopher',name:'Christopher',g:'m',hair:'brun',style:'boucles',skin:'clair',shirt:'rouge',     acc:'aucun'},
+  {id:'hayden',name:'Hayden',g:'m',hair:'noir',   style:'court',   skin:'foncé',     shirt:'vert',       acc:'aucun'},
+  {id:'gustave',name:'Gustave',g:'m',hair:'brun', style:'frises',  skin:'doré',      shirt:'bleu marine',acc:'aucun'},
+  {id:'zion',  name:'Zion',  g:'m',hair:'noir',   style:'boucles', skin:'mat',       shirt:'bleu',       acc:'aucun'},
+];
+const KEY='coureurs-sofia-v4';
+let kids=JSON.parse(JSON.stringify(DEFAULTS));
+try{const saved=JSON.parse(localStorage.getItem(KEY)||'null');if(saved)kids=kids.map(k=>Object.assign(k,saved[k.id]||{}))}catch(e){}
+function save(){try{const o={};kids.forEach(k=>o[k.id]={hair:k.hair,style:k.style,skin:k.skin,shirt:k.shirt,acc:k.acc,eyes:k.eyes||'ronds'});localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
+
+/* ---------- dessin d'un enfant ---------- */
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function drawKid(g,S,k){
+  const x=S/2,y=S*.42,r=S*.2,H=col(HAIR,k.hair),SK=col(SKIN,k.skin),SH=col(SHIRT,k.shirt);
+  g.clearRect(0,0,S,S);g.lineWidth=Math.max(2,S*.016);g.strokeStyle=INK;g.lineJoin='round';g.lineCap='round';
+  const fill=c=>{g.fillStyle=c;g.fill();g.stroke()};
+  const longish=['long','couettes','queue','chignon'].includes(k.style);
+  // cheveux derrière
+  if(k.style==='long'){rr(g,x-r*1.14,y-r*.7,r*2.28,r*2.15,r*.9);fill(H)}
+  if(k.style==='couettes')for(const s of[-1,1]){g.beginPath();g.ellipse(x+s*r*1.28,y+r*.4,r*.34,r*.56,s*.35,0,7);fill(H);
+    g.beginPath();g.arc(x+s*r*1.08,y+r*.02,r*.1,0,7);fill('#FF5C8A')}
+  if(k.style==='queue'){g.beginPath();g.ellipse(x+r*1.12,y+r*.5,r*.3,r*.72,-.4,0,7);fill(H)}
+  if(k.style==='chignon'){g.beginPath();g.arc(x,y-r*1.14,r*.4,0,7);fill(H)}
+  if(k.style==='boucles')for(let i=0;i<11;i++){const a=Math.PI*(.85+i*.13);g.beginPath();g.arc(x+Math.cos(a)*r*1.02,y+Math.sin(a)*r*1.0,r*.32,0,7);fill(H)}
+  if(k.style==='frises'){for(let i=0;i<17;i++){const a=Math.PI*(.8+i*.0875);g.beginPath();g.arc(x+Math.cos(a)*r*1.08,y+Math.sin(a)*r*1.06,r*.24,0,7);fill(H)}
+    for(let i=0;i<9;i++){const a=Math.PI*(1.1+i*.1);g.beginPath();g.arc(x+Math.cos(a)*r*.8,y+Math.sin(a)*r*.86,r*.22,0,7);fill(H)}}
+  // bras levés + mains (on dit bonjour !)
+  const lw0=g.lineWidth;
+  for(const s of[-1,1]){const sx=x+s*r*1.0,sy=y+r*1.5,hx=x+s*r*1.62,hy=y+r*.72;
+    g.lineWidth=r*.38;g.strokeStyle=INK;g.beginPath();g.moveTo(sx,sy);g.lineTo(hx,hy);g.stroke();
+    g.lineWidth=r*.26;g.strokeStyle=SH;g.beginPath();g.moveTo(sx,sy);g.lineTo(hx,hy);g.stroke();
+    g.lineWidth=lw0;g.strokeStyle=INK;
+    g.beginPath();g.arc(hx,hy-r*.04,r*.21,0,7);fill(SK);
+    g.beginPath();g.moveTo(hx-s*r*.04,hy-r*.2);g.lineTo(hx-s*r*.04,hy-r*.06);g.stroke()}
+  // corps (maillot de course)
+  g.beginPath();g.moveTo(x-r*1.25,S+4);g.lineTo(x-r*1.05,y+r*1.3);g.quadraticCurveTo(x,y+r*.98,x+r*1.05,y+r*1.3);g.lineTo(x+r*1.25,S+4);g.closePath();fill(SH);
+  g.beginPath();g.moveTo(x-r*.35,y+r*1.12);g.quadraticCurveTo(x,y+r*1.45,x+r*.35,y+r*1.12);g.strokeStyle='rgba(255,253,246,.9)';g.lineWidth*=1.6;g.stroke();
+  g.lineWidth=Math.max(2,S*.016);g.strokeStyle=INK;
+  g.fillStyle=SK;g.fillRect(x-r*.22,y+r*.82,r*.44,r*.32);
+  // oreilles + tête
+  for(const s of[-1,1]){g.beginPath();g.arc(x+s*r*.98,y+r*.12,r*.18,0,7);fill(SK)}
+  g.beginPath();g.arc(x,y,r,0,7);fill(SK);
+  // visage
+  for(const s of[-1,1]){
+    if(k.eyes==='amande'){
+      g.beginPath();g.ellipse(x+s*r*.36,y+r*.08,r*.16,r*.085,s*-.12,0,7);g.fillStyle=INK;g.fill();
+      g.beginPath();g.arc(x+s*r*.36+r*.06,y+r*.05,r*.03,0,7);g.fillStyle='#fff';g.fill();
+    }else{
+      g.beginPath();g.arc(x+s*r*.36,y+r*.08,r*.13,0,7);g.fillStyle=INK;g.fill();
+      g.beginPath();g.arc(x+s*r*.36+r*.05,y+r*.03,r*.045,0,7);g.fillStyle='#fff';g.fill();
+    }
+    g.beginPath();g.arc(x+s*r*.6,y+r*.38,r*.12,0,7);g.fillStyle='rgba(255,92,138,.3)';g.fill();
+  }
+  g.beginPath();g.arc(x,y+r*.36,r*.24,.25,Math.PI-.25);g.stroke();
+  // frange / dessus des cheveux (découpé dans la tête)
+  g.save();g.beginPath();g.arc(x,y,r*1.06,0,7);g.clip();
+  const side=longish?r*.25:-r*.18,top=k.style==='court'||k.style==='herisse'?-r*.42:-r*.3;
+  g.beginPath();g.moveTo(x-r*1.2,y+side);g.lineTo(x-r*.95,y+side);
+  g.quadraticCurveTo(x-r*.75,y+top-r*.25,x-r*.3,y+top);g.quadraticCurveTo(x+r*.05,y+top-r*.3,x+r*.42,y+top+r*.02);
+  g.quadraticCurveTo(x+r*.8,y+top-r*.2,x+r*.95,y+side);g.lineTo(x+r*1.2,y+side);g.lineTo(x+r*1.2,y-r*1.3);g.lineTo(x-r*1.2,y-r*1.3);g.closePath();
+  g.fillStyle=H;g.fill();g.stroke();g.restore();
+  g.beginPath();g.arc(x,y,r,Math.PI*1.05,Math.PI*1.95);g.stroke();
+  if(k.style==='herisse'){g.fillStyle=H;for(let i=0;i<6;i++){const a=Math.PI*(1.12+i*.152);const bx=x+Math.cos(a)*r*.92,by=y+Math.sin(a)*r*.92;
+    g.beginPath();g.moveTo(bx-r*.16,by+r*.05);g.lineTo(x+Math.cos(a)*r*1.38,y+Math.sin(a)*r*1.38);g.lineTo(bx+r*.16,by+r*.05);g.closePath();g.fill();g.stroke()}}
+  if(k.style==='boucles')for(let i=0;i<5;i++){g.beginPath();g.arc(x-r*.6+i*r*.3,y-r*.42-(i%2)*r*.08,r*.2,0,7);fill(H)}
+  if(k.style==='frises')for(let i=0;i<7;i++){g.beginPath();g.arc(x-r*.72+i*r*.24,y-r*.5-(i%2)*r*.1,r*.16,0,7);fill(H)}
+  if(k.style==='long'||k.style==='queue')for(const s of(k.style==='long'?[-1,1]:[-1])){g.beginPath();g.ellipse(x+s*r*.9,y+r*.35,r*.2,r*.62,s*-.12,0,7);fill(H)}
+  // accessoires
+  if(k.acc==='noeud'){const bx=x+r*.55,by=y-r*.82;g.fillStyle='#FF5C8A';
+    for(const s of[-1,1]){g.beginPath();g.moveTo(bx,by);g.lineTo(bx+s*r*.42,by-r*.22);g.lineTo(bx+s*r*.42,by+r*.22);g.closePath();g.fill();g.stroke()}
+    g.beginPath();g.arc(bx,by,r*.1,0,7);g.fill();g.stroke()}
+  if(k.acc==='lunettes'){g.lineWidth*=1.2;for(const s of[-1,1]){g.beginPath();g.arc(x+s*r*.36,y+r*.08,r*.24,0,7);g.stroke()}
+    g.beginPath();g.moveTo(x-r*.12,y+r*.06);g.lineTo(x+r*.12,y+r*.06);g.stroke();g.lineWidth/=1.2}
+  if(k.acc==='casquette'){g.beginPath();g.moveTo(x-r*1.02,y-r*.28);g.quadraticCurveTo(x,y-r*1.55,x+r*1.02,y-r*.28);g.closePath();fill(SH);
+    g.beginPath();g.ellipse(x+r*.65,y-r*.3,r*.6,r*.14,0,0,7);fill(SH);
+    g.beginPath();g.arc(x,y-r*.98,r*.08,0,7);fill(SH)}
+}
+function kidCanvas(k,css,px){const c=document.createElement('canvas');c.width=c.height=px;c.style.width=c.style.height=css+'px';drawKid(c.getContext('2d'),px,k);return c}
+
+/* ---------- voix française ---------- */
+let frVoice=null;
+function pickVoice(){try{const fr=speechSynthesis.getVoices().filter(v=>/^fr/i.test(v.lang));const ff=fr.filter(v=>/fr[-_]FR/i.test(v.lang));
+  frVoice=ff.find(v=>/Amélie|Amelie|Audrey|Thomas|Denise|Henri|Julie|Google/.test(v.name))||ff[0]||fr.find(v=>!/CA/i.test(v.lang))||null}catch(e){}}
+pickVoice();try{speechSynthesis.addEventListener('voiceschanged',pickVoice)}catch(e){}
+function say(t){try{if(!frVoice)pickVoice();if(!frVoice)return;const u=new SpeechSynthesisUtterance(t);u.voice=frVoice;u.lang=frVoice.lang;u.pitch=1.15;u.rate=.95;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+let ac;function beep(f,d,v=.12){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d)}catch(e){}}
+const hello=k=>k.me?'Coucou, c’est moi, Sofia ! On fait la course ?':`Salut, je suis ${k.name} ! Je suis prêt${k.g==='f'?'e':''} pour la course !`;
+
+/* ---------- grille ---------- */
+const $=s=>document.querySelector(s);
+function render(){
+  const girls=kids.filter(k=>k.g==='f'),boys=kids.filter(k=>k.g==='m');
+  $('#nGirls').textContent=girls.length;$('#nBoys').textContent=boys.length;
+  [['#girls',girls],['#boys',boys]].forEach(([sel,list])=>{const box=$(sel);box.innerHTML='';
+    list.forEach(k=>{const b=document.createElement('button');b.className='card'+(k.me?' me':'');b.setAttribute('aria-label',`${k.name}, changer son look`);
+      const bib=document.createElement('span');bib.className='bib';bib.textContent=String(kids.indexOf(k)+1).padStart(2,'0');
+      b.append(bib,kidCanvas(k,120,240),k.name);
+      if(k.me){const s=document.createElement('span');s.className='star';s.textContent='C’est moi !';b.append(s)}
+      b.onclick=()=>{b.classList.remove('hop');void b.offsetWidth;b.classList.add('hop');beep(660,.12);say(hello(k));setTimeout(()=>openEditor(k),450)};
+      box.append(b)})});
+}
+
+/* ---------- personnalisation ---------- */
+let cur=null;
+function openEditor(k){cur=k;$('#edName').textContent=k.name;buildOpts();$('#sheet').hidden=false;$('#done').focus()}
+function buildOpts(){
+  const k=cur;drawKid($('#big').getContext('2d'),400,k);
+  const sw=(sel,list,field)=>{const row=$(sel);row.innerHTML='';list.forEach(([key,c])=>{const b=document.createElement('button');b.className='sw';b.style.background=c;
+    b.setAttribute('aria-label',key);b.title=key;b.setAttribute('aria-pressed',k[field]===key);b.onclick=()=>{k[field]=key;beep(880,.08);save();buildOpts()};row.append(b)})};
+  const pk=(sel,list,field)=>{const row=$(sel);row.innerHTML='';list.forEach(([key,txt])=>{const b=document.createElement('button');b.className='pick';
+    b.setAttribute('aria-pressed',k[field]===key);b.append(kidCanvas(Object.assign({},k,{[field]:key}),64,128),txt);b.onclick=()=>{k[field]=key;beep(880,.08);save();buildOpts()};row.append(b)})};
+  pk('#optStyle',STYLES,'style');sw('#optHair',HAIR,'hair');sw('#optSkin',SKIN,'skin');sw('#optShirt',SHIRT,'shirt');pk('#optAcc',ACC,'acc');pk('#optEyes',EYES,'eyes');
+}
+function closeEditor(){$('#sheet').hidden=true;render()}
+$('#done').onclick=()=>{beep(990,.15);closeEditor()};
+$('#hello').onclick=()=>say(hello(cur));
+$('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')closeEditor()});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeEditor()});
+
+/* ---------- fiche pour papa ---------- */
+function sheetText(){return 'Coureurs de Sofia\n'+kids.map((k,i)=>`${String(i+1).padStart(2,'0')}. ${k.name} (${k.g==='f'?'fille':'garçon'}) : cheveux ${label(STYLES,k.style).toLowerCase()} ${k.hair}, peau ${k.skin}, yeux ${label(EYES,k.eyes||'ronds').toLowerCase()}, maillot ${k.shirt}, accessoire ${label(ACC,k.acc).toLowerCase()}`).join('\n')}
+$('#copyBtn').onclick=()=>{const t=sheetText(),out=$('#copyOut');out.value=t;
+  const ok=()=>{$('#copyBtn').textContent='✔ Fiche copiée'},fail=()=>{out.hidden=false;out.focus();out.select();$('#copyBtn').textContent='Sélectionne le texte et copie-le'};
+  try{navigator.clipboard.writeText(t).then(ok,fail)}catch(e){fail()}
+  setTimeout(()=>{$('#copyBtn').textContent='📋 Copier la fiche des coureurs'},2500)};
+let resetArmed=false;
+$('#resetBtn').onclick=()=>{if(!resetArmed){resetArmed=true;$('#resetBtn').textContent='Sûr ? Touche encore';setTimeout(()=>{resetArmed=false;$('#resetBtn').textContent='↺ Revenir aux propositions'},3000);return}
+  kids=JSON.parse(JSON.stringify(DEFAULTS));try{localStorage.removeItem(KEY)}catch(e){}resetArmed=false;$('#resetBtn').textContent='↺ Revenir aux propositions';render()};
+
+render();
+</script>
