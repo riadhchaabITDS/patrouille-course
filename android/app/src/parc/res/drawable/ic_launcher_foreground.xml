@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icône « La sortie au parc » : une enfant qui descend le toboggan, bras en l'air, au parc -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- soleil -->
+    <path android:fillColor="#FFC83D" android:strokeColor="#1F2A44" android:strokeWidth="1.2"
+        android:pathData="M72,31 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 Z" />
+    <!-- nuage -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M44,30 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z M50,28 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 Z M58,31 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z" />
+    <!-- herbe -->
+    <path android:fillColor="#6CCB5F" android:strokeColor="#1F2A44" android:strokeWidth="1.5"
+        android:pathData="M0,80 Q54,68 108,80 L108,108 L0,108 Z" />
+    <!-- arbre -->
+    <path android:fillColor="#8A5A2B" android:strokeColor="#1F2A44" android:strokeWidth="1.2"
+        android:pathData="M31,56 h4 v21 h-4 Z" />
+    <path android:fillColor="#3FA34D" android:strokeColor="#1F2A44" android:strokeWidth="1.2"
+        android:pathData="M24,50 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0 Z" />
+    <path android:fillColor="#3FA34D" android:strokeColor="#1F2A44" android:strokeWidth="1.2"
+        android:pathData="M23,57 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 Z M31,57 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 Z" />
+    <!-- échelle + plateforme du toboggan -->
+    <path android:fillColor="#3D7BFF" android:strokeColor="#1F2A44" android:strokeWidth="1"
+        android:pathData="M42,44 h2.5 v34 h-2.5 Z M48,44 h2.5 v34 h-2.5 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#3D7BFF" android:strokeWidth="1.6"
+        android:pathData="M44.5,52 h3.5 M44.5,58 h3.5 M44.5,64 h3.5 M44.5,70 h3.5" />
+    <path android:fillColor="#C98B4E" android:strokeColor="#1F2A44" android:strokeWidth="1.2"
+        android:pathData="M41,42 h13 v3 h-13 Z" />
+    <!-- toboggan jaune -->
+    <path android:fillColor="#FFC83D" android:strokeColor="#1F2A44" android:strokeWidth="1.5" android:strokeLineJoin="round"
+        android:pathData="M52,42 L84,72 L86,72 L86,78 L80,78 L49,48 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#FF5C8A" android:strokeWidth="1.4" android:strokeLineCap="round"
+        android:pathData="M53,40 L85,69" />
+    <!-- jambes -->
+    <path android:fillColor="#00000000" android:strokeColor="#2C3E66" android:strokeWidth="2.6" android:strokeLineCap="round"
+        android:pathData="M66,63 L73,67 M64,64 L70,69" />
+    <!-- bras levés -->
+    <path android:fillColor="#00000000" android:strokeColor="#FF5C8A" android:strokeWidth="2.6" android:strokeLineCap="round"
+        android:pathData="M60,57 L55,48 M66,56 L70,47" />
+    <path android:fillColor="#F5CBA7" android:strokeColor="#1F2A44" android:strokeWidth="0.8"
+        android:pathData="M53.4,47.5 a1.8,1.8 0 1,0 3.6,0 a1.8,1.8 0 1,0 -3.6,0 Z M68.4,46.5 a1.8,1.8 0 1,0 3.6,0 a1.8,1.8 0 1,0 -3.6,0 Z" />
+    <!-- corps (t-shirt rose) -->
+    <path android:fillColor="#FF5C8A" android:strokeColor="#1F2A44" android:strokeWidth="1.2"
+        android:pathData="M57.5,60 a5.5,6 0 1,0 11,0 a5.5,6 0 1,0 -11,0 Z" />
+    <!-- cheveux derrière -->
+    <path android:fillColor="#6B3F22" android:strokeColor="#1F2A44" android:strokeWidth="1"
+        android:pathData="M55,50 Q55,42 61.5,42 Q68,42 68,50 L68,55 Q61.5,57 55,55 Z" />
+    <!-- tête -->
+    <path android:fillColor="#F5CBA7" android:strokeColor="#1F2A44" android:strokeWidth="1.2"
+        android:pathData="M56,50 a5.5,5.5 0 1,0 11,0 a5.5,5.5 0 1,0 -11,0 Z" />
+    <!-- frange -->
+    <path android:fillColor="#6B3F22"
+        android:pathData="M56.2,48.5 Q57,44 61.5,44 Q66,44 66.8,48.5 Q64,46.5 61.5,47.5 Q59,46.5 56.2,48.5 Z" />
+    <!-- yeux + sourire -->
+    <path android:fillColor="#1F2A44"
+        android:pathData="M58.8,50.3 a0.9,0.9 0 1,0 1.8,0 a0.9,0.9 0 1,0 -1.8,0 Z M62.6,50.3 a0.9,0.9 0 1,0 1.8,0 a0.9,0.9 0 1,0 -1.8,0 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#1F2A44" android:strokeWidth="0.8" android:strokeLineCap="round"
+        android:pathData="M59.5,52.6 Q61.5,54.6 63.5,52.6" />
+    <!-- nœud rose -->
+    <path android:fillColor="#FF5C8A" android:strokeColor="#1F2A44" android:strokeWidth="0.8"
+        android:pathData="M65,44 L61.8,42.2 L61.8,45.8 Z M65,44 L68.2,42.2 L68.2,45.8 Z" />
+</vector>
