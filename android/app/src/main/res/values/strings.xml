@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">La Patrouille qui fait la course</string>
+    <!-- Le nom de l'appli (app_name) est défini par jeu dans app/build.gradle.kts -->
     <color name="ic_bg">#FFC83D</color>
 </resources>

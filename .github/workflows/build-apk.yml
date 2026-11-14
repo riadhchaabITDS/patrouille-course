@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,22 +27,40 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      # Polices du jeu embarquées dans l'app (licence SIL OFL). Si le téléchargement échoue, l'app utilise les polices du téléphone.
-      - name: Polices du jeu
+      # Polices des jeux embarquées dans les applis (licence SIL OFL). Si le téléchargement échoue, l'appli utilise les polices du téléphone.
+      - name: Polices des jeux
         continue-on-error: true
         run: |
           mkdir -p fonts
           curl -fsSL -o fonts/Baloo2.ttf "https://github.com/google/fonts/raw/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf"
           curl -fsSL -o fonts/Nunito.ttf "https://github.com/google/fonts/raw/main/ofl/nunito/Nunito%5Bwght%5D.ttf"
 
-      - name: Construire l'APK
+      - name: Construire les deux applis
         working-directory: android
         run: gradle assembleRelease --no-daemon --stacktrace
 
-      - name: Renommer l'APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk PatrouilleCourse.apk
+      - name: Renommer les APK
+        run: |
+          cp android/app/build/outputs/apk/patrouille/release/app-patrouille-release.apk PatrouilleCourse.apk
+          cp android/app/build/outputs/apk/parc/release/app-parc-release.apk SortieAuParc.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PatrouilleCourse-apk
-          path: PatrouilleCourse.apk
+          name: applis-android
+          path: |
+            PatrouilleCourse.apk
+            SortieAuParc.apk
+
+      # Téléchargement direct depuis le téléphone : .../releases/latest/download/<nom>.apk
+      - name: Publier en téléchargement direct
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: Applis Android n°${{ github.run_number }}
+          make_latest: true
+          body: |
+            - PatrouilleCourse.apk : La Patrouille qui fait la course
+            - SortieAuParc.apk : La sortie au parc
+          files: |
+            PatrouilleCourse.apk
+            SortieAuParc.apk

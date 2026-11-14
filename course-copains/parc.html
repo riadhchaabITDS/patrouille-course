@@ -584,8 +584,16 @@ function confetti(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)re
   let f=0;(function st(){x.clearRect(0,0,innerWidth,innerHeight);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=.1;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-4,-2,8+p.r,5);x.restore()});
     if(++f<200)requestAnimationFrame(st);else x.clearRect(0,0,innerWidth,innerHeight)})()}
 
-/* version en ligne (hors Claude) : on cache l'étiquette « Maquette » */
-if(location.protocol==='https:'&&!/claude/i.test(location.hostname)){const t=$('.tag');t.style.visibility='hidden'}
+/* version en ligne (hors Claude) ou app Android : on cache l'étiquette « Maquette » */
+if(window.AndroidTTS||(location.protocol==='https:'&&!/claude/i.test(location.hostname))){const t=$('.tag');t.style.visibility='hidden'}
+/* app Android : bouton retour, pause quand on quitte l'app */
+let musicWasOn=false;
+window.appPause=()=>{if(R&&!R.done&&!$('#race').hidden)setPause(true);musicWasOn=Music.playing;Music.stop();hush()};
+window.appResume=()=>{if(musicWasOn)Music.start()};
+window.onAndroidBack=()=>{
+  if(!$('#race').hidden&&R&&!R.done){if(R.paused)quitRace();else setPause(true);return true}
+  if($('#home').hidden){goHome();return true}
+  return false};
 /* accueil : quelques enfants qui saluent */
 (()=>{const h=$('#home'),row=document.createElement('div');row.style.cssText='display:flex;gap:2px;flex-wrap:wrap;justify-content:center';
   KIDS.slice(0,6).forEach(k=>row.append(kidCanvas(k,70)));h.insertBefore(row,h.querySelector('h2'))})();
